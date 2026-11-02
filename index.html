@@ -175,6 +175,10 @@ h2{margin:0;font-family:var(--serif);font-size:17px;color:var(--walnut);letter-s
 .menu button{display:flex;justify-content:space-between;align-items:center;border:0;background:transparent;text-align:left;padding:0 14px;min-height:52px;font-size:14.5px;border-top:1px solid var(--line)}
 .menu button:first-child{border-top:0}
 .menu button span{font-size:12px;color:var(--soft)}
+.thanks{text-align:center;display:flex;flex-direction:column;gap:4px;padding:18px 14px;background:linear-gradient(180deg,#fffaf0,#fffdf9);border:1.5px solid #e9d3a8}
+.thanks b{font-family:var(--serif);font-size:18px;color:var(--walnut)}
+.thanks .num{font-family:var(--num);font-size:34px;font-weight:700;color:var(--forest);line-height:1.2}
+.thanks span{font-size:13px;color:var(--muted);line-height:1.6}
 .sig{text-align:center;font-size:11px;color:#b9a689;letter-spacing:1.5px;margin:28px 0 8px}
 /* 底部導覽 */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,253,249,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
@@ -314,6 +318,23 @@ async function loadMonth(){
 }
 
 
+
+/* ---------- 暖心話 ---------- */
+var WARM={
+  done:['辛苦啦，謝謝你','謝謝你，有你真好','完成了，辛苦了','謝謝你的用心','辛苦了，喝口水休息一下','好棒，謝謝你','店裡因為你更好了，謝謝','謝謝你，真的辛苦了'],
+  help:['謝謝你幫忙，大家都看到了','你真是好隊友，謝謝','謝謝你補位，辛苦啦','有你幫忙真好，謝謝'],
+  claim:['謝謝你願意接手','交給你了，辛苦啦','有你在真安心','謝謝你主動幫忙','謝謝你，慢慢來就好'],
+  release:['沒關係，大家會接手的','先忙你的，辛苦了','說一聲就好，謝謝你'],
+  read:['收到，謝謝你','謝謝你看完','記住了，謝謝你','謝謝你用心看'],
+  task:['送出了，謝謝你提醒大家','謝謝你把事情記下來'],
+  notice:['發布了，謝謝你的提醒','謝謝你幫大家記住'],
+  check:['謝謝你','辛苦啦','很棒','做得好','謝謝你的細心','好，下一項','你真細心','慢慢來就好'],
+  cele:['謝謝你把店準備好。<br>今天也一起加油，慢慢來，好好餉。','辛苦啦！店準備好了。<br>謝謝你，今天也請多多照顧自己。','謝謝你這麼用心開店。<br>客人一進門，就感覺得到。','準備好了，辛苦了！<br>有你在，今天一定很順利。'],
+  sub:['謝謝你今天來','今天也辛苦了','有你在，店裡很安心','慢慢來，好好餉','謝謝你的用心','今天也一起加油']
+};
+function warm(k){var a=WARM[k];return a[Math.floor(Math.random()*a.length)];}
+function hello(){var h=+new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',hour:'numeric',hour12:false}).format(new Date());return h<11?'早安':h<17?'午安':'晚安';}
+var SUBI=Math.floor(Math.random()*6);
 /* ---------- SOP（版本 5.0，制定：店長，2026/11/02） ---------- */
 var LEAF='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8906A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"/><path d="M5 19l7-7"/></svg>';
 var SOP={
@@ -343,7 +364,7 @@ function renderOpenFlow(confirm){
   var c=getChecks(),tot=0,done=0;
   SOP.open.groups.forEach(function(g,gi){g.items.forEach(function(x,ii){tot++;if(c[gi+'-'+ii])done++;});});
   var h=flowHead('開店準備',Math.round(done/tot*100))+'<div class="wrap">'+
-    '<header class="hd" style="padding-top:14px"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>早安，一起開店吧</h1><div class="sub">已準備 '+done+' / '+tot+' 項・勾完按最下面的「開店囉」</div></header>';
+    '<header class="hd" style="padding-top:14px"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>'+hello()+'，一起開店吧</h1><div class="sub">已準備 '+done+' / '+tot+' 項・勾完按最下面的「開店囉」</div></header>';
   SOP.open.groups.forEach(function(g,gi){
     var gd=g.items.filter(function(x,ii){return c[gi+'-'+ii];}).length;
     h+='<section class="fgrp"><h2>'+esc(g.t)+'<small>'+gd+' / '+g.items.length+'</small></h2>'+
@@ -360,7 +381,7 @@ function renderOpenFlow(confirm){
   $('flow').firstChild.scrollTop=y;
 }
 function celebrate(){
-  $('flow').innerHTML='<div class="flow" role="dialog" aria-modal="true" aria-label="開店囉"><div class="cele"><div class="sun" style="width:64px;height:64px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center">'+ICON.done+'</div><div class="cele-t">開店囉</div><p>謝謝你把店準備好。<br>今天也一起加油，慢慢來，好好餉。</p><button type="button" class="btn pri big" data-act="flow-close">回到今日</button></div></div>';
+  $('flow').innerHTML='<div class="flow" role="dialog" aria-modal="true" aria-label="開店囉"><div class="cele"><div class="sun" style="width:64px;height:64px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center">'+ICON.done+'</div><div class="cele-t">開店囉</div><p>'+warm('cele')+'</p><button type="button" class="btn pri big" data-act="flow-close">回到今日</button></div></div>';
 }
 function sopView(key){
   var sp=SOP[key];
@@ -442,13 +463,13 @@ function trailHtml(it){
 function viewToday(){
   var rs=activeRoutines();var done=rs.filter(function(r){var l=logOf(r.id);return l&&l.done_at;}).length;var tot=rs.length;
   var circ=2*Math.PI*19,len=tot?circ*done/tot:0;
-  var h='<header class="hd wrap"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>今日店務</h1><div class="sub">'+longDate(S.today)+'・'+esc(S.me.display_name)+'，今天也辛苦了</div>'+
+  var h='<header class="hd wrap"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>今日店務</h1><div class="sub">'+longDate(S.today)+'・'+hello()+'，'+esc(S.me.display_name)+'，'+WARM.sub[SUBI]+'</div>'+
     '<div class="card prog"><svg width="48" height="48" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#E8D9C5" stroke-width="6"/><circle cx="23" cy="23" r="19" fill="none" stroke="#3D6B4A" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' 200" transform="rotate(-90 23 23)"/></svg>'+
-    '<div style="display:flex;flex-direction:column;gap:2px"><b>今天大家一起完成 '+done+' / '+tot+' 件</b><span>'+(tot&&done===tot?'例行事項都好了，謝謝大家':'看到沒人接手的，順手「我來」就好')+'</span></div></div></header><main class="wrap">';
+    '<div style="display:flex;flex-direction:column;gap:2px"><b>今天大家一起完成 '+done+' / '+tot+' 件</b><span>'+(tot&&done===tot?'例行事項都好了，大家辛苦了，謝謝你們':done===0?'一起開始吧，看到沒人接手的就順手「我來」':done*2>=tot?'已經過一半了，辛苦啦，謝謝大家':'謝謝大家，慢慢來就好')+'</span></div></div></header><main class="wrap">';
   if(!S.opening){
     h+='<section class="sec"><div class="card openhero"><div class="sun"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div><div class="oh-t">早安，一起把店準備好吧</div><div class="oh-s">照著開店清單一項一項來，準備好就開門</div><button type="button" class="btn pri big" data-act="open-flow">開店囉</button></div></section>';
   }else{
-    h+='<section class="sec"><div class="card opened">'+ICON.done+'<div class="tx"><b>今天的店開好了</b><span>謝謝 '+esc(nm(S.opening.opened_by))+'，今天也一起加油</span></div><button type="button" class="linkbtn" data-act="open-flow">開店清單</button></div></section>';
+    h+='<section class="sec"><div class="card opened">'+ICON.done+'<div class="tx"><b>今天的店開好了</b><span>'+(S.opening.opened_by===S.me.id?'謝謝你把店準備好，辛苦啦':'謝謝 '+esc(nm(S.opening.opened_by))+' 把店準備好，辛苦啦')+'</span></div><button type="button" class="linkbtn" data-act="open-flow">開店清單</button></div></section>';
   }
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
   var over=open.filter(function(t){return t.due_date&&t.due_date<S.today;}).length,dueT=open.filter(function(t){return t.due_date===S.today;}).length,nobody=open.filter(function(t){return !t.claimed_by;}).length;
@@ -523,6 +544,7 @@ function viewMe(){
   var me=S.me;
   var h='<header class="hd wrap"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>我的</h1></header><main class="wrap">'+
     '<div class="card me-card"><div class="avatar">'+esc(me.display_name.slice(0,1))+'</div><b style="font-size:17px">'+esc(me.display_name)+'</b><span class="chip calm">'+ROLE[me.role]+'・帳號 '+esc(me.username)+'</span></div>'+
+    '<div class="sec"><div class="card thanks"><b>謝謝你，'+esc(me.display_name)+'</b><span>這 30 天你一起完成了</span><div class="num">'+(S.myCount==null?'…':S.myCount)+'</div><span>'+(S.myCount?'件事。每一件都讓店更好，辛苦啦！':'件事。慢慢來，有你在就很好。')+'</span></div></div>'+
     '<div class="sec"><div class="menu"><button type="button" data-act="pw">修改我的密碼<span>›</span></button>'+
     (canManage()?'<button type="button" data-act="routines">例行清單設定<span>'+activeRoutines().length+' 項 ›</span></button>':'')+
     (me.role==='admin'?'<button type="button" data-act="users">夥伴帳號<span>'+Object.keys(S.people).length+' 人 ›</span></button>':'')+
@@ -541,10 +563,19 @@ async function refresh(){
   var before={};S.tasks.forEach(function(t){if(t.done_at)before[t.id]=1;});var had=S.tasks.length>0;
   try{await loadToday();if(S.tab==='cal')await loadMonth();render();}catch(e){toast(errMsg(e));return;}
   if(had){var fresh=S.tasks.filter(function(t){return t.done_at&&!before[t.id]&&t.done_by!==S.me.id;});
-    if(fresh.length)toast(fresh.length===1?nm(fresh[0].done_by)+' 完成了「'+fresh[0].title+'」':fresh.length+' 件待辦剛完成，謝謝大家');}
+    if(fresh.length)toast(fresh.length===1?nm(fresh[0].done_by)+' 完成了「'+fresh[0].title+'」，謝謝 '+nm(fresh[0].done_by)+'！':fresh.length+' 件待辦剛完成，大家辛苦了');}
+}
+async function loadMyCount(){
+  try{var since=tpeDate(new Date(Date.now()-29*864e5));var sz=new Date(since+'T00:00:00+08:00').toISOString();
+    var r=await Promise.all([sb.from('ops_routine_logs').select('id',{count:'exact',head:true}).eq('done_by',S.me.id).gte('day',since),
+      sb.from('ops_tasks').select('id',{count:'exact',head:true}).eq('done_by',S.me.id).gte('done_at',sz),
+      sb.from('ops_openings').select('day',{count:'exact',head:true}).eq('opened_by',S.me.id).gte('day',since)]);
+    S.myCount=(r[0].count||0)+(r[1].count||0)+(r[2].count||0);}catch(e){S.myCount=0;}
+  if(S.tab==='me')render();
 }
 async function go(tab){
   S.tab=tab;window.scrollTo(0,0);
+  if(tab==='me'){S.myCount=null;loadMyCount();}
   if(tab==='cal'){if(!S.cal){var t=S.today.split('-');S.cal={y:+t[0],m:+t[1]-1,sel:S.today,logs:[],events:[],tasks:[]};}try{await loadMonth();}catch(e){toast(errMsg(e));}}
   render();
 }
@@ -561,7 +592,7 @@ function peopleOptions(sel,withNone){var o=withNone?'<option value="">大家都�
 
 function sheetRelease(kind,id){
   openSheet('請人幫看一下','把這件事放回大家的清單，<br>有空的人就會接手。','<form id="fRel"><div class="fld"><label for="relNote">想說明一下嗎？（可不填）</label><textarea id="relNote" maxlength="200" placeholder="例如：我去送外送，電視麻煩誰看一下"></textarea></div><div class="two"><button type="button" class="btn ghost full" data-close>先不用</button><button class="btn pri full" type="submit">放回清單</button></div></form>');
-  $('fRel').addEventListener('submit',async function(e){e.preventDefault();await act(kind,id,'release',$('relNote').value);closeSheet();toast('已放回清單，大家會看到');});
+  $('fRel').addEventListener('submit',async function(e){e.preventDefault();await act(kind,id,'release',$('relNote').value);closeSheet();toast(warm('release'));});
 }
 function sheetRoutineMore(id){
   var r=S.routines.find(function(x){return x.id===id;});var l=logOf(id)||{};
@@ -589,7 +620,7 @@ function sheetNewTask(){
     e.preventDefault();var b=e.target.querySelector('[type=submit]');b.disabled=true;
     var r=await sb.from('ops_tasks').insert({title:$('tkTitle').value.trim(),detail:$('tkDetail').value.trim()||null,due_date:$('tkDue').value||null,hope_for:$('tkHope').value||null});
     b.disabled=false;if(r.error){$('tkErr').textContent=errMsg(r.error);return;}
-    closeSheet();toast('已送出，大家都看得到了');refresh();
+    closeSheet();toast(warm('task'));refresh();
   });
 }
 function sheetNewEvent(){
@@ -604,7 +635,7 @@ function sheetNewEvent(){
     var r=await sb.from('ops_events').insert({day:$('evDay').value,time_text:$('evTime').value.trim()||null,title:$('evTitle').value.trim(),note:$('evNote').value.trim()||null});
     b.disabled=false;if(r.error){$('evErr').textContent=errMsg(r.error);return;}
     S.cal.sel=$('evDay').value;var p=S.cal.sel.split('-');S.cal.y=+p[0];S.cal.m=+p[1]-1;
-    closeSheet();toast('已加到行事曆');await loadMonth();render();
+    closeSheet();toast('加到行事曆了，謝謝你');await loadMonth();render();
   });
 }
 function sheetNewNotice(){
@@ -618,7 +649,7 @@ function sheetNewNotice(){
     e.preventDefault();var b=e.target.querySelector('[type=submit]');b.disabled=true;
     var r=await sb.from('ops_notices').insert({title:$('nTitle').value.trim(),body:$('nBody').value.trim()||null,category:$('nCat').value,pinned:$('nPin').checked});
     b.disabled=false;if(r.error){$('nErr').textContent=errMsg(r.error);return;}
-    closeSheet();toast('已發布，大家都看得到了');refresh();
+    closeSheet();toast(warm('notice'));refresh();
   });
 }
 function sheetNoticeMore(id){
@@ -733,7 +764,11 @@ async function act(kind,id,action,note){
 document.addEventListener('click',async function(e){
   var t=e.target.closest('[data-tab],[data-tab-go],[data-act],[data-act2],[data-seg],[data-nseg],[data-day],[data-mon],[data-close],[data-fchk],[data-sop]');if(!t)return;
   if(t.hasAttribute('data-close')){closeSheet();return;}
-  if(t.dataset.fchk){var c=getChecks();c[t.dataset.fchk]=!c[t.dataset.fchk];if(!c[t.dataset.fchk])delete c[t.dataset.fchk];setChecks(c);renderOpenFlow(false);return;}
+  if(t.dataset.fchk){var c=getChecks();var k=t.dataset.fchk;c[k]=!c[k];if(!c[k])delete c[k];setChecks(c);renderOpenFlow(false);
+    if(c[k]){var gi=+k.split('-')[0],g=SOP.open.groups[gi];var all=g.items.every(function(x,ii){return c[gi+'-'+ii];});
+      var everything=SOP.open.groups.every(function(gg,gj){return gg.items.every(function(x,ii){return c[gj+'-'+ii];});});
+      toast(everything?'全部準備好了，辛苦啦！按下面開店吧':all?'「'+g.t+'」都準備好了，辛苦啦':warm('check'));}
+    return;}
   if(t.dataset.sop){sopView(t.dataset.sop);return;}
   if(t.dataset.tab){go(t.dataset.tab);return;}
   if(t.dataset.tabGo){go(t.dataset.tabGo);return;}
@@ -744,13 +779,13 @@ document.addEventListener('click',async function(e){
   var a=t.dataset.act||t.dataset.act2,id=t.dataset.id;
   if(t.disabled)return;
   switch(a){
-    case 'r-claim': t.disabled=true; if(await act('r',id,'claim'))toast('交給你了，謝謝'); break;
-    case 'r-done': t.disabled=true; if(await act('r',id,'done'))toast('記下了，謝謝你'); break;
+    case 'r-claim': t.disabled=true; if(await act('r',id,'claim'))toast(warm('claim')); break;
+    case 'r-done': { t.disabled=true; var lg=logOf(id); var hp=lg&&lg.claimed_by&&lg.claimed_by!==S.me.id; if(await act('r',id,'done'))toast(warm(hp?'help':'done')); break; }
     case 'r-release': sheetRelease('r',id); break;
     case 'r-more': sheetRoutineMore(id); break;
     case 'r-undo': closeSheet(); await act('r',id,'undo'); break;
-    case 't-claim': t.disabled=true; if(await act('t',id,'claim'))toast('交給你了，謝謝'); break;
-    case 't-done': t.disabled=true; if(await act('t',id,'done'))toast('完成了，謝謝你'); break;
+    case 't-claim': t.disabled=true; if(await act('t',id,'claim'))toast(warm('claim')); break;
+    case 't-done': { t.disabled=true; var tk=S.tasks.find(function(x){return x.id===id;}); var hp2=tk&&tk.claimed_by&&tk.claimed_by!==S.me.id; if(await act('t',id,'done'))toast(warm(hp2?'help':'done')); break; }
     case 't-release': sheetRelease('t',id); break;
     case 't-more': sheetTaskMore(id); break;
     case 't-undo': closeSheet(); await act('t',id,'undo'); break;
@@ -765,7 +800,7 @@ document.addEventListener('click',async function(e){
     case 'open-go': await doOpen(); break;
     case 'n-new': sheetNewNotice(); break;
     case 'n-more': sheetNoticeMore(id); break;
-    case 'n-read': { t.disabled=true; var r4=await sb.from('ops_notice_reads').insert({notice_id:id}); if(r4.error&&!/duplicate/i.test(r4.error.message))toast(errMsg(r4.error)); else {toast('收到，謝謝你');refresh();} break; }
+    case 'n-read': { t.disabled=true; var r4=await sb.from('ops_notice_reads').insert({notice_id:id}); if(r4.error&&!/duplicate/i.test(r4.error.message))toast(errMsg(r4.error)); else {toast(warm('read'));refresh();} break; }
     case 'n-pin': { var nn=S.notices.find(function(x){return x.id===id;}); var r5=await sb.from('ops_notices').update({pinned:!nn.pinned}).eq('id',id); closeSheet(); if(r5.error)toast(errMsg(r5.error)); else {toast(nn.pinned?'已取消置頂':'已置頂');refresh();} break; }
     case 'n-hide': { var r6=await sb.from('ops_notices').update({active:false}).eq('id',id); closeSheet(); if(r6.error)toast(errMsg(r6.error)); else {toast('已收起');refresh();} break; }
     case 'pw': sheetPassword(); break;
