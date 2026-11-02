@@ -75,6 +75,21 @@ h2{margin:0;font-family:var(--serif);font-size:17px;color:var(--walnut);letter-s
 .chip.calm{color:var(--soft);background:#f1e8da}
 .chip.ok{color:var(--forest);background:var(--forest-l)}
 .chip.who{color:var(--walnut);background:var(--gold-l)}
+/* 注意事項 */
+.ncard{display:flex;flex-direction:column;gap:7px}
+.ncard .nhd{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ncard .nt{font-size:15px;line-height:1.45;word-break:break-word}
+.ncard .nb{font-size:13.5px;line-height:1.75;color:var(--ink);white-space:pre-line;word-break:break-word}
+.ncard.clip .nb{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ncard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
+.ncard .by{font-size:12px;color:var(--muted)}
+.ncard.unread{border-color:#e2c48c;box-shadow:0 0 0 3px var(--gold-l)}
+.chip.c-q{color:var(--rust);background:var(--rust-l)} .chip.c-f{color:#8a2f2f;background:#f6e0dc} .chip.c-p{color:var(--forest);background:var(--forest-l)} .chip.c-e{color:var(--walnut);background:#efe3cf} .chip.c-g{color:var(--soft);background:#f1e8da}
+.pin{font-size:11.5px;font-weight:700;color:var(--soft)}
+.seen{font-size:12.5px;color:var(--forest);font-weight:700;background:none;border:0;padding:6px 2px}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;min-height:44px;margin-bottom:6px}
+.chk input{width:20px;height:20px;accent-color:var(--forest)}
+.namelist{display:flex;flex-wrap:wrap;gap:6px}
 .empty{text-align:center;font-size:13px;color:var(--soft);padding:18px 10px;border:1px dashed var(--line2);border-radius:var(--r)}
 .trail{display:flex;flex-direction:column}
 .trail .it{display:grid;grid-template-columns:48px 14px minmax(0,1fr);column-gap:10px;align-items:start}
@@ -121,7 +136,7 @@ h2{margin:0;font-family:var(--serif);font-size:17px;color:var(--walnut);letter-s
 .sig{text-align:center;font-size:11px;color:#b9a689;letter-spacing:1.5px;margin:28px 0 8px}
 /* 底部導覽 */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,253,249,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
 nav.tabs button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--soft);min-height:52px;justify-content:center;position:relative}
 nav.tabs button.on{color:var(--forest);font-weight:700}
 nav.tabs .badge{position:absolute;top:4px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#C2601F;color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--num)}
@@ -156,7 +171,8 @@ nav.tabs .badge{position:absolute;top:4px;left:calc(50% + 8px);min-width:17px;he
 <nav class="tabs" id="tabs" hidden>
   <div class="in">
     <button type="button" data-tab="today"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/></svg>今日</button>
-    <button type="button" data-tab="tasks"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>拜託<span class="badge" id="taskBadge" hidden></span></button>
+    <button type="button" data-tab="tasks"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>待辦<span class="badge" id="taskBadge" hidden></span></button>
+    <button type="button" data-tab="notes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2"/><path d="M5 16V11a7 7 0 0114 0v5l2 2H3z"/><path d="M10 20a2 2 0 004 0"/></svg>注意<span class="badge" id="noteBadge" hidden></span></button>
     <button type="button" data-tab="cal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>行事曆</button>
     <button type="button" data-tab="me"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>我的</button>
   </div>
@@ -174,7 +190,8 @@ var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storageKey:'mx-ops-auth
 var SLOTS=[['open','開店前'],['noon','午後'],['close','打烊']];
 var ROLE={admin:'管理者',manager:'主管',staff:'夥伴'};
 var WD=['日','一','二','三','四','五','六'];
-var S={me:null,people:{},routines:[],logs:[],tasks:[],cal:null,tab:'today',taskSeg:'open',chan:null,today:''};
+var S={me:null,people:{},routines:[],logs:[],tasks:[],notices:[],reads:[],cal:null,tab:'today',taskSeg:'open',noteSeg:'all',chan:null,today:''};
+var CAT={'品質':'c-q','食安':'c-f','流程':'c-p','設備':'c-e','一般':'c-g'};
 
 /* ---------- 小工具 ---------- */
 function $(id){return document.getElementById(id);}
@@ -229,10 +246,13 @@ async function loadToday(){
   var res=await Promise.all([
     sb.from('ops_routines').select('*').order('slot').order('sort'),
     sb.from('ops_routine_logs').select('*').eq('day',S.today),
-    sb.from('ops_tasks').select('*').or('done_at.is.null,done_at.gte."'+since+'"').order('created_at',{ascending:false})
+    sb.from('ops_tasks').select('*').or('done_at.is.null,done_at.gte."'+since+'"').order('created_at',{ascending:false}),
+    sb.from('ops_notices').select('*').eq('active',true).order('pinned',{ascending:false}).order('created_at',{ascending:false}),
+    sb.from('ops_notice_reads').select('*')
   ]);
   res.forEach(function(r){if(r.error)throw r.error;});
-  S.routines=res[0].data;S.logs=res[1].data;S.tasks=res[2].data;
+  S.routines=res[0].data;S.logs=res[1].data;S.tasks=res[2].data;S.notices=res[3].data;S.reads=res[4].data;
+  var unread=S.notices.filter(function(n){return !iRead(n.id);}).length;var nb=$('noteBadge');nb.textContent=unread;nb.hidden=!unread;
   var openN=S.tasks.filter(function(t){return !t.done_at;}).length;
   var bd=$('taskBadge');bd.textContent=openN;bd.hidden=!openN;
 }
@@ -247,6 +267,26 @@ async function loadMonth(){
   ]);
   res.forEach(function(r){if(r.error)throw r.error;});
   c.logs=res[0].data;c.events=res[1].data;c.tasks=res[2].data;
+}
+
+/* ---------- 注意事項 ---------- */
+function readersOf(id){return S.reads.filter(function(r){return r.notice_id===id&&S.people[r.user_id];});}
+function iRead(id){return S.reads.some(function(r){return r.notice_id===id&&r.user_id===S.me.id;});}
+function canEditNote(n){return n.created_by===S.me.id||canManage();}
+function noticeCard(n,clip){
+  var read=iRead(n.id),cnt=readersOf(n.id).length;
+  return '<div class="card ncard'+(clip?' clip':'')+(read?'':' unread')+'"><div class="nhd"><span class="chip '+(CAT[n.category]||'c-g')+'">'+esc(n.category)+'</span>'+(n.pinned?'<span class="pin">置頂</span>':'')+'</div>'+
+    '<b class="nt">'+esc(n.title)+'</b>'+(n.body?'<div class="nb">'+esc(n.body)+'</div>':'')+
+    '<div class="foot"><span class="by">'+esc(nm(n.created_by))+'・'+md(tpeDate(new Date(n.created_at)))+'</span>'+
+    '<div class="acts"><button type="button" class="seen" data-act="n-more" data-id="'+n.id+'">'+(cnt?'已看過 '+cnt+' 人':'詳細')+'</button>'+(read?'':'<button type="button" class="btn pri" data-act="n-read" data-id="'+n.id+'">我看過了</button>')+'</div></div></div>';
+}
+function viewNotes(){
+  var unread=S.notices.filter(function(n){return !iRead(n.id);});
+  var list=S.noteSeg==='unread'?unread:S.notices;
+  return '<header class="hd wrap"><div class="eyebrow">大家一起記得</div><h1>注意事項</h1><div class="sub">看完按一下「我看過了」，大家就知道訊息傳到了</div></header><main class="wrap">'+
+    '<div class="sec" style="margin-top:12px"><button type="button" class="btn pri full" data-act="n-new">'+ICON.plus+'新增注意事項</button>'+
+    '<div class="seg" role="tablist"><button type="button" role="tab" class="'+(S.noteSeg==='all'?'on':'')+'" data-nseg="all">全部 '+S.notices.length+'</button><button type="button" role="tab" class="'+(S.noteSeg==='unread'?'on':'')+'" data-nseg="unread">我還沒看 '+unread.length+'</button></div>'+
+    (list.length?list.map(function(n){return noticeCard(n,false);}).join(''):'<div class="empty">'+(S.noteSeg==='unread'?'都看過了，謝謝你':'目前沒有注意事項')+'</div>')+'</div></main>';
 }
 
 /* ---------- 今日 ---------- */
@@ -279,7 +319,7 @@ function taskCard(t){
     st='<span class="chip calm">還沒有人接手</span>';
     acts='<div class="acts"><button type="button" class="btn pri" data-act="t-claim" data-id="'+t.id+'">我來</button></div>';
   }
-  var meta=esc(nm(t.created_by))+' 拜託大家'+(t.hope_for?'・想請 '+esc(nm(t.hope_for))+' 幫忙':'');
+  var meta=esc(nm(t.created_by))+' 提出'+(t.hope_for?'・想請 '+esc(nm(t.hope_for))+' 處理':'');
   if(t.done_at)meta+='・'+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at);
   return '<div class="card tcard'+(t.done_at?' faded':'')+'"><div class="top"><b>'+esc(t.title)+'</b>'+dueChip+'</div>'+
     (t.detail?'<div class="meta" style="color:var(--ink)">'+esc(t.detail)+'</div>':'')+
@@ -303,28 +343,31 @@ function viewToday(){
   var h='<header class="hd wrap"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>今日店務</h1><div class="sub">'+longDate(S.today)+'・'+esc(S.me.display_name)+'，今天也辛苦了</div>'+
     '<div class="card prog"><svg width="48" height="48" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#E8D9C5" stroke-width="6"/><circle cx="23" cy="23" r="19" fill="none" stroke="#3D6B4A" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' 200" transform="rotate(-90 23 23)"/></svg>'+
     '<div style="display:flex;flex-direction:column;gap:2px"><b>今天大家一起完成 '+done+' / '+tot+' 件</b><span>'+(tot&&done===tot?'例行事項都好了，謝謝大家':'看到沒人接手的，順手「我來」就好')+'</span></div></div></header><main class="wrap">';
+  var pins=S.notices.filter(function(n){return n.pinned;});
+  if(pins.length){var un=pins.filter(function(n){return !iRead(n.id);}).length;
+    h+='<section class="sec"><div class="sec-h"><h2>需要注意</h2>'+(un?'<small>你還有 '+un+' 則沒看</small>':'<button type="button" class="linkbtn" data-tab-go="notes">看全部</button>')+'</div>'+pins.map(function(n){return noticeCard(n,true);}).join('')+'</section>';}
   SLOTS.forEach(function(s){
     var list=rs.filter(function(r){return r.slot===s[0];});if(!list.length)return;
     var d=list.filter(function(r){var l=logOf(r.id);return l&&l.done_at;}).length;
     h+='<section class="sec"><div class="sec-h"><h2>'+s[1]+'</h2><small>'+d+' / '+list.length+'</small></div>'+list.map(routineRow).join('')+'</section>';
   });
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
-  h+='<section class="sec"><div class="sec-h"><h2>拜託大家</h2><button type="button" class="linkbtn" data-act="t-new">＋ 拜託一件事</button></div>'+(open.length?open.slice(0,4).map(taskCard).join(''):'<div class="empty">目前沒有待幫忙的事</div>')+(open.length>4?'<button type="button" class="linkbtn" data-tab-go="tasks" style="align-self:center">看全部 '+open.length+' 件</button>':'')+'</section>';
+  h+='<section class="sec"><div class="sec-h"><h2>大家的待辦</h2><button type="button" class="linkbtn" data-act="t-new">＋ 新增待辦</button></div>'+(open.length?open.slice(0,4).map(taskCard).join(''):'<div class="empty">目前沒有待辦</div>')+(open.length>4?'<button type="button" class="linkbtn" data-tab-go="tasks" style="align-self:center">看全部 '+open.length+' 件</button>':'')+'</section>';
   var todayTasks=S.tasks.filter(function(t){return t.done_at&&tpeDate(new Date(t.done_at))===S.today;});
   h+='<section class="sec"><div class="sec-h"><h2>今天店裡的足跡</h2><small>依時間排序</small></div>'+trailHtml(trailItems(S.logs,todayTasks))+'</section>';
   h+='</main>';
   return h;
 }
 
-/* ---------- 拜託 ---------- */
+/* ---------- 待辦 ---------- */
 function viewTasks(){
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
   var done=S.tasks.filter(function(t){return t.done_at;}).sort(function(a,b){return new Date(b.done_at)-new Date(a.done_at);});
   var list=S.taskSeg==='open'?open:done;
-  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>拜託大家</h1><div class="sub">誰有空就接手，做完說一聲「好了」</div></header><main class="wrap">'+
-    '<div class="sec" style="margin-top:12px"><button type="button" class="btn pri full" data-act="t-new">'+ICON.plus+'拜託一件事</button>'+
+  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>待辦事項</h1><div class="sub">誰有空就接手，做完說一聲「好了」</div></header><main class="wrap">'+
+    '<div class="sec" style="margin-top:12px"><button type="button" class="btn pri full" data-act="t-new">'+ICON.plus+'新增待辦</button>'+
     '<div class="seg" role="tablist"><button type="button" role="tab" class="'+(S.taskSeg==='open'?'on':'')+'" data-seg="open">進行中 '+open.length+'</button><button type="button" role="tab" class="'+(S.taskSeg==='done'?'on':'')+'" data-seg="done">最近完成 '+done.length+'</button></div>'+
-    (list.length?list.map(taskCard).join(''):'<div class="empty">'+(S.taskSeg==='open'?'目前沒有待幫忙的事':'最近 30 天還沒有完成的拜託')+'</div>')+'</div></main>';
+    (list.length?list.map(taskCard).join(''):'<div class="empty">'+(S.taskSeg==='open'?'目前沒有待辦':'最近 30 天還沒有完成的待辦')+'</div>')+'</div></main>';
 }
 
 /* ---------- 行事曆 ---------- */
@@ -351,11 +394,11 @@ function viewCal(){
   var h='<header class="hd wrap"><div class="eyebrow" style="font-family:var(--num);letter-spacing:4px">'+y+'</div>'+
     '<div class="cal-h"><button type="button" class="icon-btn" data-mon="-1" aria-label="上個月">'+ICON.left+'</button><h1>'+(m+1)+' 月</h1><button type="button" class="icon-btn" data-mon="1" aria-label="下個月">'+ICON.right+'</button></div></header>'+
     '<main class="wrap"><div class="cal"><div class="wk">'+WD.map(function(w){return '<span>'+w+'</span>';}).join('')+'</div><div class="days">'+cells+'</div>'+
-    '<div class="legend"><span><i class="i-ok"></i>例行全部完成</span><span><i class="i-due"></i>拜託的期限</span><span><i class="i-ev"></i>行程</span></div></div>';
+    '<div class="legend"><span><i class="i-ok"></i>例行全部完成</span><span><i class="i-due"></i>待辦的期限</span><span><i class="i-ev"></i>行程</span></div></div>';
   h+='<section class="sec"><div class="sec-h"><h2>'+longDate(sel)+'</h2><button type="button" class="linkbtn" data-act="e-new">＋ 新增行程</button></div>';
   h+=evs.length?evs.map(function(e){var can=e.created_by===S.me.id||canManage();return '<div class="card ev"><span class="tm">'+esc(e.time_text||'全天')+'</span><div class="tx"><b>'+esc(e.title)+'</b>'+(e.note?'<small>'+esc(e.note)+'</small>':'')+'<small>'+esc(nm(e.created_by))+' 新增</small></div>'+(can?'<button type="button" class="linkbtn" data-act="e-del" data-id="'+e.id+'" style="color:var(--soft)">移除</button>':'')+'</div>';}).join(''):'<div class="empty">這天沒有行程</div>';
   h+='</section>';
-  if(dues.length)h+='<section class="sec"><div class="sec-h"><h2>這天前要完成的拜託</h2></div>'+dues.map(taskCard).join('')+'</section>';
+  if(dues.length)h+='<section class="sec"><div class="sec-h"><h2>這天前要完成的待辦</h2></div>'+dues.map(taskCard).join('')+'</section>';
   if(sel<=S.today)h+='<section class="sec"><div class="sec-h"><h2>這天的足跡</h2><small>'+(logs.length+tdone.length)+' 件</small></div>'+trailHtml(trailItems(logs,tdone))+'</section>';
   return h+'</main>';
 }
@@ -376,7 +419,7 @@ function viewMe(){
 /* ---------- 畫面切換 ---------- */
 async function render(){
   document.querySelectorAll('nav.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===S.tab);b.setAttribute('aria-current',b.dataset.tab===S.tab?'page':'false');});
-  var v=S.tab==='today'?viewToday():S.tab==='tasks'?viewTasks():S.tab==='cal'?viewCal():viewMe();
+  var v=S.tab==='today'?viewToday():S.tab==='tasks'?viewTasks():S.tab==='notes'?viewNotes():S.tab==='cal'?viewCal():viewMe();
   $('app').innerHTML=v;
 }
 async function refresh(){
@@ -414,16 +457,16 @@ function sheetTaskMore(id){
   var t=S.tasks.find(function(x){return x.id===id;})||(S.cal&&S.cal.tasks.find(function(x){return x.id===id;}));if(!t)return;
   var canUndo=t.done_at&&(t.done_by===S.me.id||S.me.role==='admin');
   var canDel=t.created_by===S.me.id||S.me.role==='admin';
-  openSheet(t.title,esc(nm(t.created_by))+' 拜託・'+md(tpeDate(new Date(t.created_at)))+(t.done_at?'<br>'+esc(nm(t.done_by))+' 在 '+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at)+' 完成':''),
-    '<div class="stack">'+(canUndo?'<button type="button" class="btn ghost full" data-act2="t-undo" data-id="'+id+'">其實還沒好，改回進行中</button>':'')+(canDel?'<button type="button" class="btn warn full" data-act2="t-del" data-id="'+id+'">收回這件拜託</button>':'')+'<button type="button" class="btn soft full" data-close>關閉</button></div>');
+  openSheet(t.title,esc(nm(t.created_by))+' 提出・'+md(tpeDate(new Date(t.created_at)))+(t.done_at?'<br>'+esc(nm(t.done_by))+' 在 '+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at)+' 完成':''),
+    '<div class="stack">'+(canUndo?'<button type="button" class="btn ghost full" data-act2="t-undo" data-id="'+id+'">其實還沒好，改回進行中</button>':'')+(canDel?'<button type="button" class="btn warn full" data-act2="t-del" data-id="'+id+'">刪除這件待辦</button>':'')+'<button type="button" class="btn soft full" data-close>關閉</button></div>');
 }
 function sheetNewTask(){
-  openSheet('拜託一件事','寫下需要幫忙的事，大家都看得到。','<form id="fTask">'+
+  openSheet('新增待辦','寫下要做的事，大家都看得到，誰有空就接手。','<form id="fTask">'+
     '<div class="fld"><label for="tkTitle">要做什麼</label><input id="tkTitle" maxlength="80" required placeholder="例如：買湯勺、大鋼盆、篩網"></div>'+
     '<div class="fld"><label for="tkDetail">補充說明（可不填）</label><textarea id="tkDetail" maxlength="400" placeholder="例如：湯勺要長柄的，收據交給會計"></textarea></div>'+
     '<div class="two"><div class="fld"><label for="tkDue">希望哪天前</label><input id="tkDue" type="date" min="'+S.today+'"></div>'+
-    '<div class="fld"><label for="tkHope">想請誰幫忙</label><select id="tkHope">'+peopleOptions('',true)+'</select></div></div>'+
-    '<div class="err" id="tkErr"></div><button class="btn pri full" type="submit">送出拜託</button></form>');
+    '<div class="fld"><label for="tkHope">想請誰處理</label><select id="tkHope">'+peopleOptions('',true)+'</select></div></div>'+
+    '<div class="err" id="tkErr"></div><button class="btn pri full" type="submit">送出待辦</button></form>');
   $('fTask').addEventListener('submit',async function(e){
     e.preventDefault();var b=e.target.querySelector('[type=submit]');b.disabled=true;
     var r=await sb.from('ops_tasks').insert({title:$('tkTitle').value.trim(),detail:$('tkDetail').value.trim()||null,due_date:$('tkDue').value||null,hope_for:$('tkHope').value||null});
@@ -445,6 +488,30 @@ function sheetNewEvent(){
     S.cal.sel=$('evDay').value;var p=S.cal.sel.split('-');S.cal.y=+p[0];S.cal.m=+p[1]-1;
     closeSheet();toast('已加到行事曆');await loadMonth();render();
   });
+}
+function sheetNewNotice(){
+  openSheet('新增注意事項','寫給大家的提醒，例如品質、食安、流程上要留意的地方。','<form id="fN">'+
+    '<div class="fld"><label for="nTitle">標題</label><input id="nTitle" maxlength="60" required placeholder="例如：青菜分批燙，不要燙過頭"></div>'+
+    '<div class="fld"><label for="nBody">內容（可不填）</label><textarea id="nBody" maxlength="1000" placeholder="寫清楚怎麼做、為什麼"></textarea></div>'+
+    '<div class="fld"><label for="nCat">分類</label><select id="nCat">'+Object.keys(CAT).map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')+'</select></div>'+
+    '<label class="chk" for="nPin"><input type="checkbox" id="nPin"> 置頂，顯示在「今日」最上面</label>'+
+    '<div class="err" id="nErr"></div><button class="btn pri full" type="submit">發布</button></form>');
+  $('fN').addEventListener('submit',async function(e){
+    e.preventDefault();var b=e.target.querySelector('[type=submit]');b.disabled=true;
+    var r=await sb.from('ops_notices').insert({title:$('nTitle').value.trim(),body:$('nBody').value.trim()||null,category:$('nCat').value,pinned:$('nPin').checked});
+    b.disabled=false;if(r.error){$('nErr').textContent=errMsg(r.error);return;}
+    closeSheet();toast('已發布，大家都看得到了');refresh();
+  });
+}
+function sheetNoticeMore(id){
+  var n=S.notices.find(function(x){return x.id===id;});if(!n)return;
+  var rd=readersOf(id).sort(function(a,b){return new Date(a.read_at)-new Date(b.read_at);});
+  var seen={};rd.forEach(function(r){seen[r.user_id]=1;});
+  var notyet=Object.keys(S.people).filter(function(u){return S.people[u].active&&!seen[u];});
+  var h='<div class="fld"><label>已看過（'+rd.length+'）</label>'+(rd.length?'<div class="namelist">'+rd.map(function(r){return '<span class="chip c-p">'+esc(nm(r.user_id))+'・'+md(tpeDate(new Date(r.read_at)))+' '+hm(r.read_at)+'</span>';}).join('')+'</div>':'<span class="hint">還沒有人看過</span>')+'</div>'+
+    (notyet.length?'<div class="fld"><label>還沒看到（'+notyet.length+'）</label><div class="namelist">'+notyet.map(function(u){return '<span class="chip c-g">'+esc(nm(u))+'</span>';}).join('')+'</div></div>':'');
+  if(canEditNote(n))h+='<div class="stack" style="margin-top:6px"><button type="button" class="btn ghost full" data-act2="n-pin" data-id="'+id+'">'+(n.pinned?'取消置頂':'置頂到「今日」')+'</button><button type="button" class="btn warn full" data-act2="n-hide" data-id="'+id+'">收起這則（不再顯示）</button></div>';
+  openSheet(n.title,esc(n.category)+'・'+esc(nm(n.created_by))+' 發布',h+'<div style="margin-top:10px"><button type="button" class="btn soft full" data-close>關閉</button></div>');
 }
 function sheetPassword(){
   openSheet('修改我的密碼','','<form id="fPw"><div class="fld"><label for="pw1">新密碼（至少 8 碼）</label><input id="pw1" type="password" minlength="8" autocomplete="new-password" required></div><div class="fld"><label for="pw2">再輸入一次</label><input id="pw2" type="password" minlength="8" autocomplete="new-password" required></div><div class="err" id="pwErr"></div><button class="btn pri full" type="submit">更新密碼</button></form>');
@@ -539,11 +606,12 @@ async function act(kind,id,action,note){
   await refresh();return true;
 }
 document.addEventListener('click',async function(e){
-  var t=e.target.closest('[data-tab],[data-tab-go],[data-act],[data-act2],[data-seg],[data-day],[data-mon],[data-close]');if(!t)return;
+  var t=e.target.closest('[data-tab],[data-tab-go],[data-act],[data-act2],[data-seg],[data-nseg],[data-day],[data-mon],[data-close]');if(!t)return;
   if(t.hasAttribute('data-close')){closeSheet();return;}
   if(t.dataset.tab){go(t.dataset.tab);return;}
   if(t.dataset.tabGo){go(t.dataset.tabGo);return;}
   if(t.dataset.seg){S.taskSeg=t.dataset.seg;render();return;}
+  if(t.dataset.nseg){S.noteSeg=t.dataset.nseg;render();return;}
   if(t.dataset.day){S.cal.sel=t.dataset.day;render();return;}
   if(t.dataset.mon){var c=S.cal;c.m+=+t.dataset.mon;if(c.m<0){c.m=11;c.y--;}if(c.m>11){c.m=0;c.y++;}var tp=S.today.split('-');c.sel=(c.y===+tp[0]&&c.m===+tp[1]-1)?S.today:c.y+'-'+String(c.m+1).padStart(2,'0')+'-01';try{await loadMonth();}catch(x){toast(errMsg(x));}render();return;}
   var a=t.dataset.act||t.dataset.act2,id=t.dataset.id;
@@ -559,10 +627,15 @@ document.addEventListener('click',async function(e){
     case 't-release': sheetRelease('t',id); break;
     case 't-more': sheetTaskMore(id); break;
     case 't-undo': closeSheet(); await act('t',id,'undo'); break;
-    case 't-del': { var r=await sb.from('ops_tasks').delete().eq('id',id); closeSheet(); if(r.error)toast(errMsg(r.error)); else {toast('已收回');refresh();} break; }
+    case 't-del': { var r=await sb.from('ops_tasks').delete().eq('id',id); closeSheet(); if(r.error)toast(errMsg(r.error)); else {toast('已刪除');refresh();} break; }
     case 't-new': sheetNewTask(); break;
     case 'e-new': sheetNewEvent(); break;
     case 'e-del': { var r2=await sb.from('ops_events').delete().eq('id',id); if(r2.error)toast(errMsg(r2.error)); else {toast('已移除');await loadMonth();render();} break; }
+    case 'n-new': sheetNewNotice(); break;
+    case 'n-more': sheetNoticeMore(id); break;
+    case 'n-read': { t.disabled=true; var r4=await sb.from('ops_notice_reads').insert({notice_id:id}); if(r4.error&&!/duplicate/i.test(r4.error.message))toast(errMsg(r4.error)); else {toast('收到，謝謝你');refresh();} break; }
+    case 'n-pin': { var nn=S.notices.find(function(x){return x.id===id;}); var r5=await sb.from('ops_notices').update({pinned:!nn.pinned}).eq('id',id); closeSheet(); if(r5.error)toast(errMsg(r5.error)); else {toast(nn.pinned?'已取消置頂':'已置頂');refresh();} break; }
+    case 'n-hide': { var r6=await sb.from('ops_notices').update({active:false}).eq('id',id); closeSheet(); if(r6.error)toast(errMsg(r6.error)); else {toast('已收起');refresh();} break; }
     case 'pw': sheetPassword(); break;
     case 'users': sheetUsers(); break;
     case 'u-new': sheetUserNew(); break;
@@ -591,7 +664,9 @@ async function start(){
   $('tabs').hidden=false;
   S.chan=sb.channel('ops').on('postgres_changes',{event:'*',schema:'public',table:'ops_routine_logs'},scheduleRefresh)
     .on('postgres_changes',{event:'*',schema:'public',table:'ops_tasks'},scheduleRefresh)
-    .on('postgres_changes',{event:'*',schema:'public',table:'ops_events'},scheduleRefresh).subscribe();
+    .on('postgres_changes',{event:'*',schema:'public',table:'ops_events'},scheduleRefresh)
+    .on('postgres_changes',{event:'*',schema:'public',table:'ops_notices'},scheduleRefresh)
+    .on('postgres_changes',{event:'*',schema:'public',table:'ops_notice_reads'},scheduleRefresh).subscribe();
   render();
 }
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.me)refresh();});
