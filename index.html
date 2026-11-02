@@ -69,6 +69,13 @@ h2{margin:0;font-family:var(--serif);font-size:17px;color:var(--walnut);letter-s
 .tcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .tcard .top b{font-size:14.5px;line-height:1.45;word-break:break-word}
 .tcard .meta{font-size:12px;color:var(--muted);line-height:1.6}
+.tcard.done{border-color:#bcd3c0;background:#f7fbf6}
+.tcard .who-done{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--forest)}
+.remind{border:1.5px solid #e2c48c;background:#fffaf0}
+.remind .rh{display:flex;align-items:center;gap:10px}
+.remind .rh b{font-size:15px;color:var(--walnut)}
+.remind .rs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.allok{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--forest);font-weight:700}
 .tcard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
 .chip{flex:none;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .chip.due{color:var(--rust);background:var(--rust-l)}
@@ -205,7 +212,7 @@ function addDays(ds,n){var p=ds.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]+n)
 function dayDiff(a,b){var pa=a.split('-'),pb=b.split('-');return Math.round((new Date(+pb[0],+pb[1]-1,+pb[2])-new Date(+pa[0],+pa[1]-1,+pa[2]))/864e5);}
 function nm(id){var p=S.people[id];return p?p.display_name:'夥伴';}
 function canManage(){return S.me&&(S.me.role==='admin'||S.me.role==='manager');}
-function toast(t){var el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove('on');},2200);}
+function toast(t){var el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove('on');},t.length>14?4000:2200);}
 function errMsg(e){var m=(e&&e.message)||String(e||'');if(/Invalid login/i.test(m))return '帳號或密碼不對，再試一次';if(/network|fetch/i.test(m))return '連線不穩，請稍後再試';return m.replace(/^.*?:\s*/,'')||'發生問題，請稍後再試';}
 var ICON={
   done:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#3D6B4A"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -300,10 +307,10 @@ function routineRow(r){
   }else if(l.claimed_by){
     var mine=l.claimed_by===me;
     h='<div class="row wide"><div class="mk">'+ICON.doing+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m">'+(mine?'你正在處理':esc(nm(l.claimed_by))+' 正在處理')+'・'+hm(l.claimed_at)+'</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
-      '<div class="acts">'+(mine?'<button type="button" class="btn ghost" data-act="r-release" data-id="'+r.id+'">請人幫看</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">好了</button>':'<button type="button" class="btn soft" data-act="r-done" data-id="'+r.id+'">我幫忙完成</button>')+'</div></div>';
+      '<div class="acts">'+(mine?'<button type="button" class="btn ghost" data-act="r-release" data-id="'+r.id+'">請人幫看</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">我完成了</button>':'<button type="button" class="btn soft" data-act="r-done" data-id="'+r.id+'">我幫忙完成</button>')+'</div></div>';
   }else{
     h='<div class="row open wide"><div class="mk">'+ICON.open+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m">還沒有人接手</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
-      '<div class="acts"><button type="button" class="btn ghost" data-act="r-claim" data-id="'+r.id+'">我來</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">好了</button></div></div>';
+      '<div class="acts"><button type="button" class="btn ghost" data-act="r-claim" data-id="'+r.id+'">我來</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">我完成了</button></div></div>';
   }
   return h;
 }
@@ -311,17 +318,16 @@ function taskCard(t){
   var me=S.me.id;var st='',acts='';
   var dueChip='';
   if(t.due_date&&!t.done_at){var dd=dayDiff(S.today,t.due_date);dueChip=dd<0?'<span class="chip due">'+md(t.due_date)+' 該完成了</span>':dd===0?'<span class="chip due">今天</span>':dd<=2?'<span class="chip due">還有 '+dd+' 天</span>':'<span class="chip calm">'+md(t.due_date)+'（'+wdOf(t.due_date)+'）前</span>';}
-  if(t.done_at){st='<span class="chip ok">'+esc(nm(t.done_by))+' 完成了</span>';acts='<button type="button" class="linkbtn" data-act="t-more" data-id="'+t.id+'">更多</button>';}
+  if(t.done_at){st='<span class="who-done">'+ICON.done.replace('width="24" height="24"','width="20" height="20"')+esc(nm(t.done_by))+' 完成了・'+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at)+'</span>';acts='<button type="button" class="linkbtn" data-act="t-more" data-id="'+t.id+'">更多</button>';}
   else if(t.claimed_by){
     var mine=t.claimed_by===me;st='<span class="chip who">'+(mine?'你正在處理':esc(nm(t.claimed_by))+' 正在處理')+'</span>';
-    acts=mine?'<div class="acts"><button type="button" class="btn ghost" data-act="t-release" data-id="'+t.id+'">請人幫看</button><button type="button" class="btn pri" data-act="t-done" data-id="'+t.id+'">好了</button></div>':'<div class="acts"><button type="button" class="btn soft" data-act="t-done" data-id="'+t.id+'">我幫忙完成</button></div>';
+    acts=mine?'<div class="acts"><button type="button" class="btn ghost" data-act="t-release" data-id="'+t.id+'">請人幫看</button><button type="button" class="btn pri" data-act="t-done" data-id="'+t.id+'">我完成了</button></div>':'<div class="acts"><button type="button" class="btn soft" data-act="t-done" data-id="'+t.id+'">我幫忙完成</button></div>';
   }else{
     st='<span class="chip calm">還沒有人接手</span>';
     acts='<div class="acts"><button type="button" class="btn pri" data-act="t-claim" data-id="'+t.id+'">我來</button></div>';
   }
   var meta=esc(nm(t.created_by))+' 提出'+(t.hope_for?'・想請 '+esc(nm(t.hope_for))+' 處理':'');
-  if(t.done_at)meta+='・'+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at);
-  return '<div class="card tcard'+(t.done_at?' faded':'')+'"><div class="top"><b>'+esc(t.title)+'</b>'+dueChip+'</div>'+
+  return '<div class="card tcard'+(t.done_at?' done':'')+'"><div class="top"><b>'+esc(t.title)+'</b>'+dueChip+'</div>'+
     (t.detail?'<div class="meta" style="color:var(--ink)">'+esc(t.detail)+'</div>':'')+
     '<div class="meta">'+meta+'</div>'+(t.note?'<span class="note" style="font-size:12px;color:var(--walnut);background:var(--gold-l);border-radius:8px;padding:5px 9px;align-self:flex-start">'+esc(t.note)+'</span>':'')+
     '<div class="foot">'+st+acts+'</div></div>';
@@ -343,6 +349,15 @@ function viewToday(){
   var h='<header class="hd wrap"><div class="eyebrow">慢餉蔬食・雙連店</div><h1>今日店務</h1><div class="sub">'+longDate(S.today)+'・'+esc(S.me.display_name)+'，今天也辛苦了</div>'+
     '<div class="card prog"><svg width="48" height="48" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#E8D9C5" stroke-width="6"/><circle cx="23" cy="23" r="19" fill="none" stroke="#3D6B4A" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+' 200" transform="rotate(-90 23 23)"/></svg>'+
     '<div style="display:flex;flex-direction:column;gap:2px"><b>今天大家一起完成 '+done+' / '+tot+' 件</b><span>'+(tot&&done===tot?'例行事項都好了，謝謝大家':'看到沒人接手的，順手「我來」就好')+'</span></div></div></header><main class="wrap">';
+  var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
+  var over=open.filter(function(t){return t.due_date&&t.due_date<S.today;}).length,dueT=open.filter(function(t){return t.due_date===S.today;}).length,nobody=open.filter(function(t){return !t.claimed_by;}).length;
+  h+='<section class="sec"><div class="sec-h"><h2>還沒完成的待辦</h2><button type="button" class="linkbtn" data-act="t-new">＋ 新增待辦</button></div>';
+  if(open.length){
+    h+='<div class="card remind"><div class="rh">'+ICON.doing+'<b>還有 '+open.length+' 件待辦還沒完成</b></div><div class="rs">'+(over?'<span class="chip due">'+over+' 件已過期</span>':'')+(dueT?'<span class="chip due">'+dueT+' 件今天到期</span>':'')+(nobody?'<span class="chip calm">'+nobody+' 件還沒有人接手</span>':'')+(open.length-nobody?'<span class="chip who">'+(open.length-nobody)+' 件處理中</span>':'')+'</div></div>'+
+      open.slice(0,4).map(taskCard).join('')+(open.length>4?'<button type="button" class="linkbtn" data-tab-go="tasks" style="align-self:center">看全部 '+open.length+' 件</button>':'');
+  }else h+='<div class="card allok">'+ICON.done+'待辦都完成了，謝謝大家</div>';
+  h+='</section>';
+  var doneToday=S.tasks.filter(function(t){return t.done_at&&tpeDate(new Date(t.done_at))===S.today;}).sort(function(a,b){return new Date(b.done_at)-new Date(a.done_at);});
   var pins=S.notices.filter(function(n){return n.pinned;});
   if(pins.length){var un=pins.filter(function(n){return !iRead(n.id);}).length;
     h+='<section class="sec"><div class="sec-h"><h2>需要注意</h2>'+(un?'<small>你還有 '+un+' 則沒看</small>':'<button type="button" class="linkbtn" data-tab-go="notes">看全部</button>')+'</div>'+pins.map(function(n){return noticeCard(n,true);}).join('')+'</section>';}
@@ -351,9 +366,8 @@ function viewToday(){
     var d=list.filter(function(r){var l=logOf(r.id);return l&&l.done_at;}).length;
     h+='<section class="sec"><div class="sec-h"><h2>'+s[1]+'</h2><small>'+d+' / '+list.length+'</small></div>'+list.map(routineRow).join('')+'</section>';
   });
-  var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
-  h+='<section class="sec"><div class="sec-h"><h2>大家的待辦</h2><button type="button" class="linkbtn" data-act="t-new">＋ 新增待辦</button></div>'+(open.length?open.slice(0,4).map(taskCard).join(''):'<div class="empty">目前沒有待辦</div>')+(open.length>4?'<button type="button" class="linkbtn" data-tab-go="tasks" style="align-self:center">看全部 '+open.length+' 件</button>':'')+'</section>';
-  var todayTasks=S.tasks.filter(function(t){return t.done_at&&tpeDate(new Date(t.done_at))===S.today;});
+  if(doneToday.length)h+='<section class="sec"><div class="sec-h"><h2>今天完成的待辦</h2><small>'+doneToday.length+' 件，謝謝大家</small></div>'+doneToday.map(taskCard).join('')+'</section>';
+  var todayTasks=doneToday;
   h+='<section class="sec"><div class="sec-h"><h2>今天店裡的足跡</h2><small>依時間排序</small></div>'+trailHtml(trailItems(S.logs,todayTasks))+'</section>';
   h+='</main>';
   return h;
@@ -364,7 +378,7 @@ function viewTasks(){
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
   var done=S.tasks.filter(function(t){return t.done_at;}).sort(function(a,b){return new Date(b.done_at)-new Date(a.done_at);});
   var list=S.taskSeg==='open'?open:done;
-  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>待辦事項</h1><div class="sub">誰有空就接手，做完說一聲「好了」</div></header><main class="wrap">'+
+  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>待辦事項</h1><div class="sub">誰有空就接手，做完按「我完成了」，大家都看得到</div></header><main class="wrap">'+
     '<div class="sec" style="margin-top:12px"><button type="button" class="btn pri full" data-act="t-new">'+ICON.plus+'新增待辦</button>'+
     '<div class="seg" role="tablist"><button type="button" role="tab" class="'+(S.taskSeg==='open'?'on':'')+'" data-seg="open">進行中 '+open.length+'</button><button type="button" role="tab" class="'+(S.taskSeg==='done'?'on':'')+'" data-seg="done">最近完成 '+done.length+'</button></div>'+
     (list.length?list.map(taskCard).join(''):'<div class="empty">'+(S.taskSeg==='open'?'目前沒有待辦':'最近 30 天還沒有完成的待辦')+'</div>')+'</div></main>';
@@ -423,7 +437,10 @@ async function render(){
   $('app').innerHTML=v;
 }
 async function refresh(){
-  try{await loadToday();if(S.tab==='cal')await loadMonth();render();}catch(e){toast(errMsg(e));}
+  var before={};S.tasks.forEach(function(t){if(t.done_at)before[t.id]=1;});var had=S.tasks.length>0;
+  try{await loadToday();if(S.tab==='cal')await loadMonth();render();}catch(e){toast(errMsg(e));return;}
+  if(had){var fresh=S.tasks.filter(function(t){return t.done_at&&!before[t.id]&&t.done_by!==S.me.id;});
+    if(fresh.length)toast(fresh.length===1?nm(fresh[0].done_by)+' 完成了「'+fresh[0].title+'」':fresh.length+' 件待辦剛完成，謝謝大家');}
 }
 async function go(tab){
   S.tab=tab;window.scrollTo(0,0);
