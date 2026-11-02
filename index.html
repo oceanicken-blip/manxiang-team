@@ -76,6 +76,27 @@ h2{margin:0;font-family:var(--serif);font-size:17px;color:var(--walnut);letter-s
 .remind .rh b{font-size:15px;color:var(--walnut)}
 .remind .rs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .allok{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--forest);font-weight:700}
+.row.mine{border-color:#e2c48c;background:#fffaf0}
+.m b.own{font-weight:700;color:var(--walnut)}
+.row.mine .m b.own,.resp.mine b.own{color:#9a6a1c}
+.resp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:#faf5ec;border-radius:10px;padding:7px 10px}
+.resp.none{background:transparent;padding:0 0 0 2px}
+.resp.mine{background:var(--gold-l)}
+.resp svg{flex:none}
+.tcard.mine{border-color:#e2c48c;background:#fffaf0}
+.tnote{font-size:12px;color:var(--walnut);background:var(--gold-l);border-radius:8px;padding:5px 9px;align-self:flex-start}
+.tcard .foot.end{justify-content:flex-end}
+.tcard .foot .acts{flex-wrap:wrap;justify-content:flex-end}
+.people{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.people button{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;min-height:52px;padding:0 12px;font-size:14.5px;text-align:left}
+.people button .av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--forest-l);color:var(--forest);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:14px}
+.people button.cur{border-color:#e2c48c;background:var(--gold-l)}
+.people button small{display:block;font-size:11px;color:var(--soft)}
+.mylist{display:flex;flex-direction:column}
+.mylist .it{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.mylist .it:first-child{border-top:0;padding-top:2px}
+.mylist .it span{flex:1;min-width:0;font-size:14px;line-height:1.5;word-break:break-word}
+.mylist .it small{display:block;font-size:11.5px;color:var(--soft)}
 .tcard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
 .chip{flex:none;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .chip.due{color:var(--rust);background:var(--rust-l)}
@@ -322,7 +343,7 @@ async function loadMonth(){
 /* ---------- 暖心話 ---------- */
 var WARM={
   done:['辛苦啦，謝謝你','謝謝你，有你真好','完成了，辛苦了','謝謝你的用心','辛苦了，喝口水休息一下','好棒，謝謝你','店裡因為你更好了，謝謝','謝謝你，真的辛苦了'],
-  help:['謝謝你幫忙，大家都看到了','你真是好隊友，謝謝','謝謝你補位，辛苦啦','有你幫忙真好，謝謝'],
+  help:['交代的事完成了，辛苦啦，謝謝你','謝謝你，交給你果然放心','完成了，大家都看到了，謝謝你','辛苦啦，謝謝你把它做好'],
   claim:['謝謝你願意接手','交給你了，辛苦啦','有你在真安心','謝謝你主動幫忙','謝謝你，慢慢來就好'],
   release:['沒關係，大家會接手的','先忙你的，辛苦了','說一聲就好，謝謝你'],
   read:['收到，謝謝你','謝謝你看完','記住了，謝謝你','謝謝你用心看'],
@@ -416,38 +437,43 @@ function viewNotes(){
 /* ---------- 今日 ---------- */
 function activeRoutines(){return S.routines.filter(function(r){return r.active;});}
 function logOf(id){for(var i=0;i<S.logs.length;i++)if(S.logs[i].routine_id===id)return S.logs[i];return null;}
+/* 負責人邏輯：我來／交給誰 只決定由誰負責；完成由負責人按「我完成了」 */
+function canReassign(kind,item){if(canManage())return true;if(!item.claimed_by)return true;if(item.claimed_by===S.me.id)return true;return kind==='t'&&item.created_by===S.me.id;}
+function resp(kind,item,key){
+  var me=S.me.id,o=item.claimed_by,by=item.assigned_by;
+  if(!o)return {icon:ICON.open,open:true,text:'還沒有人負責',acts:'<button type="button" class="btn ghost" data-act="'+kind+'-assign" data-id="'+key+'">交給…</button><button type="button" class="btn pri" data-act="'+kind+'-claim" data-id="'+key+'">我來</button>'};
+  if(o===me)return {icon:ICON.doing,mine:true,text:'<b class="own">你負責</b>'+(by&&by!==me?'・'+esc(nm(by))+' 交給你':''),
+    acts:'<button type="button" class="linkbtn" data-act="'+kind+'-release" data-id="'+key+'">放回</button><button type="button" class="btn ghost" data-act="'+kind+'-assign" data-id="'+key+'">轉交</button><button type="button" class="btn pri" data-act="'+kind+'-done" data-id="'+key+'">我完成了</button>'};
+  return {icon:ICON.doing,text:'<b class="own">'+esc(nm(o))+' 負責</b>'+(by?(by===me?'・你交辦':'・'+esc(nm(by))+' 交辦'):''),
+    acts:(canReassign(kind,item)?'<button type="button" class="btn ghost" data-act="'+kind+'-assign" data-id="'+key+'">轉交</button>':'')+'<button type="button" class="btn soft" data-act="'+kind+'-claim" data-id="'+key+'">換我來</button>'};
+}
 function routineRow(r){
-  var l=logOf(r.id)||{};var me=S.me.id;var h='';
+  var l=logOf(r.id)||{};
   if(l.done_at){
-    h='<div class="row"><div class="mk">'+ICON.done+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m ok">'+esc(nm(l.done_by))+' 幫忙完成・'+hm(l.done_at)+'</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
+    return '<div class="row"><div class="mk">'+ICON.done+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m ok">'+esc(nm(l.done_by))+' 完成了・'+hm(l.done_at)+'</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
       '<div class="acts"><button type="button" class="linkbtn" data-act="r-more" data-id="'+r.id+'">留言</button></div></div>';
-  }else if(l.claimed_by){
-    var mine=l.claimed_by===me;
-    h='<div class="row wide"><div class="mk">'+ICON.doing+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m">'+(mine?'你正在處理':esc(nm(l.claimed_by))+' 正在處理')+'・'+hm(l.claimed_at)+'</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
-      '<div class="acts">'+(mine?'<button type="button" class="btn ghost" data-act="r-release" data-id="'+r.id+'">請人幫看</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">我完成了</button>':'<button type="button" class="btn soft" data-act="r-done" data-id="'+r.id+'">我幫忙完成</button>')+'</div></div>';
-  }else{
-    h='<div class="row open wide"><div class="mk">'+ICON.open+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m">還沒有人接手</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
-      '<div class="acts"><button type="button" class="btn ghost" data-act="r-claim" data-id="'+r.id+'">我來</button><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">我完成了</button></div></div>';
   }
-  return h;
+  var x=resp('r',l,r.id);
+  return '<div class="row wide'+(x.open?' open':'')+(x.mine?' mine':'')+'"><div class="mk">'+x.icon+'</div><div class="tx"><span class="t">'+esc(r.title)+'</span><span class="m">'+x.text+'</span>'+(l.note?'<span class="note">'+esc(l.note)+'</span>':'')+'</div>'+
+    '<div class="acts">'+x.acts+'</div></div>';
 }
 function taskCard(t){
-  var me=S.me.id;var st='',acts='';
   var dueChip='';
   if(t.due_date&&!t.done_at){var dd=dayDiff(S.today,t.due_date);dueChip=dd<0?'<span class="chip due">'+md(t.due_date)+' 該完成了</span>':dd===0?'<span class="chip due">今天</span>':dd<=2?'<span class="chip due">還有 '+dd+' 天</span>':'<span class="chip calm">'+md(t.due_date)+'（'+wdOf(t.due_date)+'）前</span>';}
-  if(t.done_at){st='<span class="who-done">'+ICON.done.replace('width="24" height="24"','width="20" height="20"')+esc(nm(t.done_by))+' 完成了・'+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at)+'</span>';acts='<button type="button" class="linkbtn" data-act="t-more" data-id="'+t.id+'">更多</button>';}
-  else if(t.claimed_by){
-    var mine=t.claimed_by===me;st='<span class="chip who">'+(mine?'你正在處理':esc(nm(t.claimed_by))+' 正在處理')+'</span>';
-    acts=mine?'<div class="acts"><button type="button" class="btn ghost" data-act="t-release" data-id="'+t.id+'">請人幫看</button><button type="button" class="btn pri" data-act="t-done" data-id="'+t.id+'">我完成了</button></div>':'<div class="acts"><button type="button" class="btn soft" data-act="t-done" data-id="'+t.id+'">我幫忙完成</button></div>';
+  var meta=esc(nm(t.created_by))+' 提出・'+md(tpeDate(new Date(t.created_at)))+(t.hope_for&&!t.claimed_by&&!t.done_at?'・想請 '+esc(nm(t.hope_for))+' 處理':'');
+  var foot,respLine='',cls='';
+  if(t.done_at){
+    foot='<div class="foot"><span class="who-done">'+ICON.done.replace('width="24" height="24"','width="20" height="20"')+esc(nm(t.done_by))+' 完成了・'+md(tpeDate(new Date(t.done_at)))+' '+hm(t.done_at)+'</span><button type="button" class="linkbtn" data-act="t-more" data-id="'+t.id+'">更多</button></div>';
+    cls=' done';
   }else{
-    st='<span class="chip calm">還沒有人接手</span>';
-    acts='<div class="acts"><button type="button" class="btn pri" data-act="t-claim" data-id="'+t.id+'">我來</button></div>';
+    var x=resp('t',t,t.id);
+    respLine='<div class="resp'+(x.open?' none':'')+(x.mine?' mine':'')+'">'+x.icon.replace('width="24" height="24"','width="18" height="18"')+'<span>'+x.text+'</span></div>';
+    foot='<div class="foot end"><div class="acts">'+x.acts+'</div></div>';
+    if(x.mine)cls=' mine';
   }
-  var meta=esc(nm(t.created_by))+' 提出'+(t.hope_for?'・想請 '+esc(nm(t.hope_for))+' 處理':'');
-  return '<div class="card tcard'+(t.done_at?' done':'')+'"><div class="top"><b>'+esc(t.title)+'</b>'+dueChip+'</div>'+
+  return '<div class="card tcard'+cls+'"><div class="top"><b>'+esc(t.title)+'</b>'+dueChip+'</div>'+
     (t.detail?'<div class="meta" style="color:var(--ink)">'+esc(t.detail)+'</div>':'')+
-    '<div class="meta">'+meta+'</div>'+(t.note?'<span class="note" style="font-size:12px;color:var(--walnut);background:var(--gold-l);border-radius:8px;padding:5px 9px;align-self:flex-start">'+esc(t.note)+'</span>':'')+
-    '<div class="foot">'+st+acts+'</div></div>';
+    '<div class="meta">'+meta+'</div>'+respLine+(t.note?'<span class="note tnote">'+esc(t.note)+'</span>':'')+foot+'</div>';
 }
 function trailItems(logs,tasks){
   var it=[];
@@ -471,11 +497,18 @@ function viewToday(){
   }else{
     h+='<section class="sec"><div class="card opened">'+ICON.done+'<div class="tx"><b>今天的店開好了</b><span>'+(S.opening.opened_by===S.me.id?'謝謝你把店準備好，辛苦啦':'謝謝 '+esc(nm(S.opening.opened_by))+' 把店準備好，辛苦啦')+'</span></div><button type="button" class="linkbtn" data-act="open-flow">開店清單</button></div></section>';
   }
+  var myR=rs.filter(function(r){var l=logOf(r.id);return l&&!l.done_at&&l.claimed_by===S.me.id;});
+  var myT=S.tasks.filter(function(t){return !t.done_at&&t.claimed_by===S.me.id;});
+  if(myR.length+myT.length){
+    h+='<section class="sec"><div class="sec-h"><h2>你負責的事</h2><small>'+(myR.length+myT.length)+' 件，辛苦啦</small></div><div class="card mylist" style="border-color:#e2c48c;background:#fffaf0">'+
+      myR.map(function(r){var l=logOf(r.id);return '<div class="it"><span>'+esc(r.title)+'<small>今日例行'+(l.assigned_by&&l.assigned_by!==S.me.id?'・'+esc(nm(l.assigned_by))+' 交給你':'')+'</small></span><button type="button" class="btn pri" data-act="r-done" data-id="'+r.id+'">我完成了</button></div>';}).join('')+
+      myT.map(function(t){return '<div class="it"><span>'+esc(t.title)+'<small>待辦'+(t.due_date?'・'+md(t.due_date)+' 前':'')+(t.assigned_by&&t.assigned_by!==S.me.id?'・'+esc(nm(t.assigned_by))+' 交給你':'')+'</small></span><button type="button" class="btn pri" data-act="t-done" data-id="'+t.id+'">我完成了</button></div>';}).join('')+'</div></section>';
+  }
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
   var over=open.filter(function(t){return t.due_date&&t.due_date<S.today;}).length,dueT=open.filter(function(t){return t.due_date===S.today;}).length,nobody=open.filter(function(t){return !t.claimed_by;}).length;
   h+='<section class="sec"><div class="sec-h"><h2>還沒完成的待辦</h2><button type="button" class="linkbtn" data-act="t-new">＋ 新增待辦</button></div>';
   if(open.length){
-    h+='<div class="card remind"><div class="rh">'+ICON.doing+'<b>還有 '+open.length+' 件待辦還沒完成</b></div><div class="rs">'+(over?'<span class="chip due">'+over+' 件已過期</span>':'')+(dueT?'<span class="chip due">'+dueT+' 件今天到期</span>':'')+(nobody?'<span class="chip calm">'+nobody+' 件還沒有人接手</span>':'')+(open.length-nobody?'<span class="chip who">'+(open.length-nobody)+' 件處理中</span>':'')+'</div></div>'+
+    h+='<div class="card remind"><div class="rh">'+ICON.doing+'<b>還有 '+open.length+' 件待辦還沒完成</b></div><div class="rs">'+(over?'<span class="chip due">'+over+' 件已過期</span>':'')+(dueT?'<span class="chip due">'+dueT+' 件今天到期</span>':'')+(nobody?'<span class="chip calm">'+nobody+' 件還沒有人負責</span>':'')+(open.length-nobody?'<span class="chip who">'+(open.length-nobody)+' 件處理中</span>':'')+'</div></div>'+
       open.slice(0,4).map(taskCard).join('')+(open.length>4?'<button type="button" class="linkbtn" data-tab-go="tasks" style="align-self:center">看全部 '+open.length+' 件</button>':'');
   }else h+='<div class="card allok">'+ICON.done+'待辦都完成了，謝謝大家</div>';
   h+='</section>';
@@ -499,11 +532,12 @@ function viewToday(){
 function viewTasks(){
   var open=S.tasks.filter(function(t){return !t.done_at;}).sort(function(a,b){return (a.due_date||'9999')<(b.due_date||'9999')?-1:1;});
   var done=S.tasks.filter(function(t){return t.done_at;}).sort(function(a,b){return new Date(b.done_at)-new Date(a.done_at);});
-  var list=S.taskSeg==='open'?open:done;
-  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>待辦事項</h1><div class="sub">誰有空就接手，做完按「我完成了」，大家都看得到</div></header><main class="wrap">'+
+  var mine=open.filter(function(t){return t.claimed_by===S.me.id;});
+  var list=S.taskSeg==='open'?open:S.taskSeg==='mine'?mine:done;
+  return '<header class="hd wrap"><div class="eyebrow">一起分擔</div><h1>待辦事項</h1><div class="sub">決定誰負責後，由負責的人按「我完成了」</div></header><main class="wrap">'+
     '<div class="sec" style="margin-top:12px"><button type="button" class="btn pri full" data-act="t-new">'+ICON.plus+'新增待辦</button>'+
-    '<div class="seg" role="tablist"><button type="button" role="tab" class="'+(S.taskSeg==='open'?'on':'')+'" data-seg="open">進行中 '+open.length+'</button><button type="button" role="tab" class="'+(S.taskSeg==='done'?'on':'')+'" data-seg="done">最近完成 '+done.length+'</button></div>'+
-    (list.length?list.map(taskCard).join(''):'<div class="empty">'+(S.taskSeg==='open'?'目前沒有待辦':'最近 30 天還沒有完成的待辦')+'</div>')+'</div></main>';
+    '<div class="seg" role="tablist"><button type="button" role="tab" class="'+(S.taskSeg==='open'?'on':'')+'" data-seg="open">進行中 '+open.length+'</button><button type="button" role="tab" class="'+(S.taskSeg==='mine'?'on':'')+'" data-seg="mine">我負責 '+mine.length+'</button><button type="button" role="tab" class="'+(S.taskSeg==='done'?'on':'')+'" data-seg="done">最近完成 '+done.length+'</button></div>'+
+    (list.length?list.map(taskCard).join(''):'<div class="empty">'+(S.taskSeg==='open'?'目前沒有待辦':S.taskSeg==='mine'?'你目前沒有負責的待辦':'最近 30 天還沒有完成的待辦')+'</div>')+'</div></main>';
 }
 
 /* ---------- 行事曆 ---------- */
@@ -560,9 +594,14 @@ async function render(){
   $('app').innerHTML=v;
 }
 async function refresh(){
-  var before={};S.tasks.forEach(function(t){if(t.done_at)before[t.id]=1;});var had=S.tasks.length>0;
+  var before={};S.tasks.forEach(function(t){if(t.done_at)before[t.id]=1;});var had=S.tasks.length>0||S.logs.length>0;
+  var own={};S.tasks.forEach(function(t){own['t'+t.id]=t.claimed_by;});S.logs.forEach(function(l){own['r'+l.routine_id]=l.claimed_by;});
   try{await loadToday();if(S.tab==='cal')await loadMonth();render();}catch(e){toast(errMsg(e));return;}
-  if(had){var fresh=S.tasks.filter(function(t){return t.done_at&&!before[t.id]&&t.done_by!==S.me.id;});
+  if(had){
+    var got=[];S.tasks.forEach(function(t){if(!t.done_at&&t.claimed_by===S.me.id&&own['t'+t.id]!==S.me.id&&t.assigned_by&&t.assigned_by!==S.me.id)got.push([t.assigned_by,t.title]);});
+    S.logs.forEach(function(l){if(!l.done_at&&l.claimed_by===S.me.id&&own['r'+l.routine_id]!==S.me.id&&l.assigned_by&&l.assigned_by!==S.me.id){var rr=S.routines.find(function(x){return x.id===l.routine_id;});got.push([l.assigned_by,rr?rr.title:'一件事']);}});
+    if(got.length){toast(got.length===1?nm(got[0][0])+' 把「'+got[0][1]+'」交給你了，麻煩你囉，謝謝':'有 '+got.length+' 件事交給你了，麻煩你囉，謝謝');return;}
+    var fresh=S.tasks.filter(function(t){return t.done_at&&!before[t.id]&&t.done_by!==S.me.id;});
     if(fresh.length)toast(fresh.length===1?nm(fresh[0].done_by)+' 完成了「'+fresh[0].title+'」，謝謝 '+nm(fresh[0].done_by)+'！':fresh.length+' 件待辦剛完成，大家辛苦了');}
 }
 async function loadMyCount(){
@@ -591,8 +630,19 @@ document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if($(
 function peopleOptions(sel,withNone){var o=withNone?'<option value="">大家都可以</option>':'';Object.keys(S.people).forEach(function(id){var p=S.people[id];if(!p.active)return;o+='<option value="'+id+'"'+(id===sel?' selected':'')+'>'+esc(p.display_name)+'</option>';});return o;}
 
 function sheetRelease(kind,id){
-  openSheet('請人幫看一下','把這件事放回大家的清單，<br>有空的人就會接手。','<form id="fRel"><div class="fld"><label for="relNote">想說明一下嗎？（可不填）</label><textarea id="relNote" maxlength="200" placeholder="例如：我去送外送，電視麻煩誰看一下"></textarea></div><div class="two"><button type="button" class="btn ghost full" data-close>先不用</button><button class="btn pri full" type="submit">放回清單</button></div></form>');
-  $('fRel').addEventListener('submit',async function(e){e.preventDefault();await act(kind,id,'release',$('relNote').value);closeSheet();toast(warm('release'));});
+  openSheet('放回大家的清單','沒關係，放回去之後大家都看得到，<br>有空的人就會接手。','<form id="fRel"><div class="fld"><label for="relNote">想說明一下嗎？（可不填）</label><textarea id="relNote" maxlength="200" placeholder="例如：我去送外送，電視麻煩誰看一下"></textarea></div><div class="two"><button type="button" class="btn ghost full" data-close>先不用</button><button class="btn pri full" type="submit">放回清單</button></div></form>');
+  $('fRel').addEventListener('submit',async function(e){e.preventDefault();var ok=await act(kind,id,'release',$('relNote').value);closeSheet();if(ok)toast(warm('release'));});
+}
+function itemOf(kind,id){if(kind==='r')return logOf(id)||{};return S.tasks.find(function(x){return x.id===id;})||(S.cal&&S.cal.tasks.find(function(x){return x.id===id;}))||{};}
+function titleOf(kind,id){if(kind==='r'){var r=S.routines.find(function(x){return x.id===id;});return r?r.title:'';}var t=itemOf('t',id);return t.title||'';}
+function sheetAssign(kind,id){
+  var it=itemOf(kind,id),cur=it.claimed_by;
+  var ids=Object.keys(S.people).filter(function(u){return S.people[u].active;});
+  ids.sort(function(a,b){return a===S.me.id?-1:b===S.me.id?1:0;});
+  openSheet('交給誰負責？','「'+esc(titleOf(kind,id))+'」<br>交給對方後，由他完成時按「我完成了」。',
+    '<div class="fld"><label for="asNote">想說的話（可不填）</label><input id="asNote" maxlength="200" placeholder="例如：麻煩你了，謝謝"></div>'+
+    '<div class="people">'+ids.map(function(u){var p=S.people[u];return '<button type="button" data-assign="'+u+'" data-kind="'+kind+'" data-id="'+id+'"'+(u===cur?' class="cur"':'')+'><span class="av">'+esc(p.display_name.slice(0,1))+'</span><span>'+esc(u===S.me.id?p.display_name+'（我）':p.display_name)+(u===cur?'<small>目前負責</small>':'')+'</span></button>';}).join('')+'</div>'+
+    '<div style="margin-top:12px"><button type="button" class="btn soft full" data-close>取消</button></div>');
 }
 function sheetRoutineMore(id){
   var r=S.routines.find(function(x){return x.id===id;});var l=logOf(id)||{};
@@ -614,13 +664,15 @@ function sheetNewTask(){
     '<div class="fld"><label for="tkTitle">要做什麼</label><input id="tkTitle" maxlength="80" required placeholder="例如：買湯勺、大鋼盆、篩網"></div>'+
     '<div class="fld"><label for="tkDetail">補充說明（可不填）</label><textarea id="tkDetail" maxlength="400" placeholder="例如：湯勺要長柄的，收據交給會計"></textarea></div>'+
     '<div class="two"><div class="fld"><label for="tkDue">希望哪天前</label><input id="tkDue" type="date" min="'+S.today+'"></div>'+
-    '<div class="fld"><label for="tkHope">想請誰處理</label><select id="tkHope">'+peopleOptions('',true)+'</select></div></div>'+
+    '<div class="fld"><label for="tkHope">交給誰負責</label><select id="tkHope">'+peopleOptions('',true).replace('大家都可以','先不指定')+'</select></div></div>'+
     '<div class="err" id="tkErr"></div><button class="btn pri full" type="submit">送出待辦</button></form>');
   $('fTask').addEventListener('submit',async function(e){
     e.preventDefault();var b=e.target.querySelector('[type=submit]');b.disabled=true;
-    var r=await sb.from('ops_tasks').insert({title:$('tkTitle').value.trim(),detail:$('tkDetail').value.trim()||null,due_date:$('tkDue').value||null,hope_for:$('tkHope').value||null});
+    var to=$('tkHope').value;
+    var r=await sb.from('ops_tasks').insert({title:$('tkTitle').value.trim(),detail:$('tkDetail').value.trim()||null,due_date:$('tkDue').value||null}).select('id').single();
+    if(!r.error&&to&&r.data){var r2=await sb.rpc('ops_task_do',{p_task:r.data.id,p_action:'assign',p_note:null,p_to:to});if(r2.error)r=r2;}
     b.disabled=false;if(r.error){$('tkErr').textContent=errMsg(r.error);return;}
-    closeSheet();toast(warm('task'));refresh();
+    closeSheet();toast($('tkHope')&&$('tkHope').value&&$('tkHope').value!==S.me.id?'交給 '+nm($('tkHope').value)+' 了，謝謝你們':warm('task'));refresh();
   });
 }
 function sheetNewEvent(){
@@ -755,14 +807,14 @@ async function doOpen(){
   celebrate();
 }
 /* ---------- 動作 ---------- */
-async function act(kind,id,action,note){
-  var fn=kind==='r'?'ops_routine_act':'ops_task_act';
-  var args=kind==='r'?{p_routine:id,p_action:action,p_note:note||null}:{p_task:id,p_action:action,p_note:note||null};
+async function act(kind,id,action,note,to){
+  var fn=kind==='r'?'ops_routine_do':'ops_task_do';
+  var args=kind==='r'?{p_routine:id,p_action:action,p_note:note||null,p_to:to||null}:{p_task:id,p_action:action,p_note:note||null,p_to:to||null};
   var r=await sb.rpc(fn,args);if(r.error){toast(errMsg(r.error));return false;}
   await refresh();return true;
 }
 document.addEventListener('click',async function(e){
-  var t=e.target.closest('[data-tab],[data-tab-go],[data-act],[data-act2],[data-seg],[data-nseg],[data-day],[data-mon],[data-close],[data-fchk],[data-sop]');if(!t)return;
+  var t=e.target.closest('[data-tab],[data-tab-go],[data-act],[data-act2],[data-seg],[data-nseg],[data-day],[data-mon],[data-close],[data-fchk],[data-sop],[data-assign]');if(!t)return;
   if(t.hasAttribute('data-close')){closeSheet();return;}
   if(t.dataset.fchk){var c=getChecks();var k=t.dataset.fchk;c[k]=!c[k];if(!c[k])delete c[k];setChecks(c);renderOpenFlow(false);
     if(c[k]){var gi=+k.split('-')[0],g=SOP.open.groups[gi];var all=g.items.every(function(x,ii){return c[gi+'-'+ii];});
@@ -770,6 +822,10 @@ document.addEventListener('click',async function(e){
       toast(everything?'全部準備好了，辛苦啦！按下面開店吧':all?'「'+g.t+'」都準備好了，辛苦啦':warm('check'));}
     return;}
   if(t.dataset.sop){sopView(t.dataset.sop);return;}
+  if(t.dataset.assign){var to=t.dataset.assign,k=t.dataset.kind,iid=t.dataset.id,nt=($('asNote')||{}).value||'';
+    if(itemOf(k,iid).claimed_by===to){closeSheet();return;}
+    t.disabled=true;var ok=await act(k,iid,'assign',nt,to);closeSheet();
+    if(ok)toast(to===S.me.id?warm('claim'):'交給 '+nm(to)+' 了，謝謝你們，辛苦啦');return;}
   if(t.dataset.tab){go(t.dataset.tab);return;}
   if(t.dataset.tabGo){go(t.dataset.tabGo);return;}
   if(t.dataset.seg){S.taskSeg=t.dataset.seg;render();return;}
@@ -780,13 +836,15 @@ document.addEventListener('click',async function(e){
   if(t.disabled)return;
   switch(a){
     case 'r-claim': t.disabled=true; if(await act('r',id,'claim'))toast(warm('claim')); break;
-    case 'r-done': { t.disabled=true; var lg=logOf(id); var hp=lg&&lg.claimed_by&&lg.claimed_by!==S.me.id; if(await act('r',id,'done'))toast(warm(hp?'help':'done')); break; }
+    case 'r-done': { t.disabled=true; var lg=logOf(id); var hp=lg&&lg.assigned_by&&lg.assigned_by!==S.me.id; if(await act('r',id,'done'))toast(warm(hp?'help':'done')); break; }
     case 'r-release': sheetRelease('r',id); break;
+    case 'r-assign': sheetAssign('r',id); break;
     case 'r-more': sheetRoutineMore(id); break;
     case 'r-undo': closeSheet(); await act('r',id,'undo'); break;
     case 't-claim': t.disabled=true; if(await act('t',id,'claim'))toast(warm('claim')); break;
-    case 't-done': { t.disabled=true; var tk=S.tasks.find(function(x){return x.id===id;}); var hp2=tk&&tk.claimed_by&&tk.claimed_by!==S.me.id; if(await act('t',id,'done'))toast(warm(hp2?'help':'done')); break; }
+    case 't-done': { t.disabled=true; var tk=S.tasks.find(function(x){return x.id===id;}); var hp2=tk&&tk.assigned_by&&tk.assigned_by!==S.me.id; if(await act('t',id,'done'))toast(warm(hp2?'help':'done')); break; }
     case 't-release': sheetRelease('t',id); break;
+    case 't-assign': sheetAssign('t',id); break;
     case 't-more': sheetTaskMore(id); break;
     case 't-undo': closeSheet(); await act('t',id,'undo'); break;
     case 't-del': { var r=await sb.from('ops_tasks').delete().eq('id',id); closeSheet(); if(r.error)toast(errMsg(r.error)); else {toast('已刪除');refresh();} break; }
